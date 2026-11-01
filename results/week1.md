@@ -11,7 +11,7 @@
 | whisper.cpp | `v1.9.5-257-g482279b8`（ggml 0.28.0） |
 | 电源计划 | 平衡（第 2 周改为高性能并插电再测） |
 
-原始数据：[week1_bench.csv](week1_bench.csv)（`whisper-bench`，12 个模型 × 6 种线程数）、[week1_jfk.csv](week1_jfk.csv)（`whisper-cli` 跑 `samples/jfk.wav`，6 线程）、[week1_microbench.txt](week1_microbench.txt)（memcpy 与 mul_mat 微基准）。复现：`py -3.11 scripts/week1_bench.py`。
+原始数据：[week1_bench.csv](week1_bench.csv)（`whisper-bench`，12 个模型 × 6 种线程数）、[week1_jfk.csv](week1_jfk.csv)（`whisper-cli` 跑 `samples/jfk.wav`，6 线程）、[week1_microbench.txt](week1_microbench.txt)（memcpy 与 mul_mat 微基准）。复现：`py -3.11 scripts/setup_models.py` → `py -3.11 scripts/week1_bench.py` → `py -3.11 scripts/make_tables.py`（下面两张数据表由它生成）。
 
 ## 量化等级对比（6 线程）
 
