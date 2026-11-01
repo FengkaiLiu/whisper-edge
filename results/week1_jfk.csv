@@ -1,0 +1,13 @@
+model,quant,threads,transcript,load_ms,mel_ms,sample_ms,sample_per_run_ms,encode_ms,encode_per_run_ms,decode_ms,decode_per_run_ms,batchd_ms,batchd_per_run_ms,prompt_ms,prompt_per_run_ms,total_ms
+base,f16,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",257.88,9.89,106.49,0.82,944.11,944.11,0.0,0.0,343.86,2.67,0.0,0.0,1696.75
+base,q8_0,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",147.26,9.46,102.08,0.79,519.79,519.79,4.98,4.98,263.26,2.07,0.0,0.0,1076.42
+base,q5_1,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",139.54,7.2,104.56,0.81,785.99,785.99,6.96,6.96,312.81,2.46,0.0,0.0,1386.37
+base,q5_0,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",112.18,7.68,105.65,0.81,802.52,802.52,0.0,0.0,302.66,2.33,0.0,0.0,1358.53
+base,q4_k,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",127.3,10.65,99.93,0.77,498.43,498.43,4.11,4.11,215.76,1.7,0.0,0.0,986.28
+base,q4_0,6,"And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",114.59,8.03,107.27,0.81,474.45,474.45,4.6,4.6,245.07,1.87,0.0,0.0,982.53
+small,f16,6,"And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",723.65,10.03,111.89,0.84,3413.61,3413.61,0.0,0.0,832.9,6.31,0.0,0.0,5183.63
+small,q8_0,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",409.74,10.11,104.65,0.8,2322.13,2322.13,0.0,0.0,701.37,5.4,0.0,0.0,3610.35
+small,q5_1,6,"And so, my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",297.45,6.7,108.52,0.82,3408.07,3408.07,0.0,0.0,810.42,6.14,0.0,0.0,4703.27
+small,q5_0,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",283.92,7.24,111.0,0.84,3268.17,3268.17,0.0,0.0,702.36,5.36,0.0,0.0,4437.96
+small,q4_k,6,"And so my fellow Americans, ask not what your country can do for you, ask what you can do for your country.",382.68,10.22,108.76,0.82,1652.05,1652.05,0.0,0.0,617.94,4.72,0.0,0.0,2839.48
+small,q4_0,6,"And so my fellow Americans, ask not what your country can do for you. Ask what you can do for your country.",276.44,8.66,102.23,0.79,1738.68,1738.68,0.0,0.0,636.42,4.93,0.0,0.0,2832.23
