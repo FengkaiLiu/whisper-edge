@@ -12,6 +12,7 @@
   - `week1_bench.py`：jfk 转录、bench 扫描、memcpy / mul_mat 微基准，输出到 `results/`
   - `make_tables.py`：从 CSV 生成 `results/week1.md` 里的表格
 - `results/`：原始数据（CSV）和每周的分析，见 [第 1 周](results/week1.md)
+- `docs/`：学习笔记，见 [chunk1.md](docs/chunk1.md)（第 1 周的完整推导）
 
 ## 复现
 
