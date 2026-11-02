@@ -1,0 +1,7 @@
+jiwer==4.0.0
+matplotlib==3.11.2
+numpy==2.4.6
+opencc-python-reimplemented==0.1.7
+psutil==7.2.2
+soundfile==0.14.0
+whisper_normalizer==1.0.0

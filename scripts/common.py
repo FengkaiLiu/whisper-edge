@@ -1,4 +1,5 @@
-"""Paths and model lists shared by the scripts."""
+"""Paths, model lists and helpers shared by the scripts."""
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +11,18 @@ RESULTS = ROOT / "results"
 
 SIZES = ["base", "small"]
 QUANTS = ["f16", "q8_0", "q5_1", "q5_0", "q4_k", "q4_0"]
+
+# e.g. "whisper_print_timings:   encode time =   828.18 ms /     1 runs (   828.18 ms per run)"
+TIMING_RE = re.compile(r"whisper_print_timings:\s+(\w+) time =\s+([\d.]+) ms(?: /\s+(\d+) runs \(\s*([\d.]+) ms per run\))?")
+
+
+def parse_timings(text):
+    out = {}
+    for name, total, runs, per_run in TIMING_RE.findall(text):
+        out[f"{name}_ms"] = float(total)
+        if per_run:
+            out[f"{name}_per_run_ms"] = float(per_run)
+    return out
 
 
 def model_path(size, quant):

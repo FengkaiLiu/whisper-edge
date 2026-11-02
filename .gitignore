@@ -4,3 +4,5 @@ results_week1_log.txt
 __pycache__/
 .venv/
 build_cuda_*.txt
+data/
+results/hyp/**/*.txt

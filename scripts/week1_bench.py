@@ -11,24 +11,11 @@ Usage: py -3.11 scripts/week1_bench.py [--steps jfk bench micro]
 """
 import argparse
 import csv
-import re
 
-from common import QUANTS, RESULTS, ROOT, SIZES, exe, model_path, run
+from common import QUANTS, RESULTS, ROOT, SIZES, exe, model_path, parse_timings, run
 
 JFK = ROOT / "third_party/whisper.cpp/samples/jfk.wav"
 THREADS = [1, 2, 4, 6, 8, 12]
-
-# e.g. "whisper_print_timings:   encode time =   828.18 ms /     1 runs (   828.18 ms per run)"
-TIMING_RE = re.compile(r"whisper_print_timings:\s+(\w+) time =\s+([\d.]+) ms(?: /\s+(\d+) runs \(\s*([\d.]+) ms per run\))?")
-
-
-def parse_timings(text):
-    out = {}
-    for name, total, runs, per_run in TIMING_RE.findall(text):
-        out[f"{name}_ms"] = float(total)
-        if per_run:
-            out[f"{name}_per_run_ms"] = float(per_run)
-    return out
 
 
 def bench_sweep():

@@ -1,0 +1,3 @@
+lang,model,threads,repeat,n_utts,audio_s,file_mb,metric,err,rtf,rtf_wall,peak_mb,load,mel,sample,encode,decode,batchd,prompt
+ja,base-q5_1,6,0,100,1380.0,56.9,cer,0.232,0.1141,0.1146,234.5,3.7,10.5,180.0,799.3,2.3,572.2,0.0
+ja,base-q5_0,6,0,100,1380.0,52.7,cer,0.241,0.1072,0.1077,230.7,3.8,10.4,180.9,740.2,3.0,534.4,0.0
