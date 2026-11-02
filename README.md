@@ -18,7 +18,7 @@
   - `compare_tags.py`：同一模型两次运行（如 CPU vs CUDA）的逐句一致率、错误率差和加速比
   - `cuda/devq.cu`：GPU 参数查询 + 显存 / PCIe 带宽测试
 - `manifests/`：评测用的句子清单（音频本身在 `data/`，不入库）
-- `results/`：原始数据（CSV）和每周的分析，见 [第 1 周](results/week1.md)、[第 2 周](results/week2.md)（CPU）、[第 2 周 GPU](results/week2_cuda.md)（RTX 5080 + CUDA）
+- `results/`：原始数据（CSV）和每周的分析，见 [第 1 周](results/week1.md)、[第 2 周](results/week2.md)（CPU）、[第 2 周 GPU](results/week2_cuda.md)（RTX 5080 + CUDA）、[第 2 周台式机 CPU](results/week2_9700x.md)（Ryzen 7 9700X，把加速拆成换 CPU 和加 GPU 两段）
 - `docs/`：学习笔记，见 [chunk1.md](docs/chunk1.md)（第 1 周的完整推导）、[cuda_guide.md](docs/cuda_guide.md)（CUDA 入门和第一轮 GPU 数据，配合第 2–3 周）、[jd_knowledge.md](docs/jd_knowledge.md)（按岗位要求拆解的知识地图和面试题）
 
 ## 复现
@@ -53,4 +53,14 @@ GPU（RTX 5080 台式机，先按 [cuda_guide.md](docs/cuda_guide.md) 第 1 节�
 .venv/Scripts/python.exe scripts/bootstrap_ci.py --tag week2_cuda
 .venv/Scripts/python.exe scripts/plot_week2.py --tag week2_cuda --label "RTX 5080 (CUDA) + Ryzen 7 9700X, 8 threads"
 .venv/Scripts/python.exe scripts/compare_tags.py week2_cpu week2_cuda
+```
+
+同一台台式机的纯 CPU 基线（`build/`，约 1 小时）：
+
+```bash
+.venv/Scripts/python.exe -u scripts/evaluate.py --tag week2_9700x --threads 8
+.venv/Scripts/python.exe scripts/bootstrap_ci.py --tag week2_9700x
+.venv/Scripts/python.exe scripts/plot_week2.py --tag week2_9700x --label "Ryzen 7 9700X, 8 threads"
+.venv/Scripts/python.exe scripts/compare_tags.py week2_cpu week2_9700x
+.venv/Scripts/python.exe scripts/compare_tags.py week2_9700x week2_cuda
 ```
