@@ -11,8 +11,9 @@
   - `setup_models.py`：下载 base / small 并生成 q8_0、q5_1、q5_0、q4_k、q4_0（已存在的跳过）
   - `week1_bench.py`：jfk 转录、bench 扫描、memcpy / mul_mat 微基准，输出到 `results/`
   - `make_tables.py`：从 CSV 生成 `results/week1.md` 里的表格
+  - `cuda/devq.cu`：GPU 参数查询 + 显存 / PCIe 带宽测试
 - `results/`：原始数据（CSV）和每周的分析，见 [第 1 周](results/week1.md)
-- `docs/`：学习笔记，见 [chunk1.md](docs/chunk1.md)（第 1 周的完整推导）
+- `docs/`：学习笔记，见 [chunk1.md](docs/chunk1.md)（第 1 周的完整推导）、[cuda_guide.md](docs/cuda_guide.md)（CUDA 入门和第一轮 GPU 数据，配合第 2–3 周）、[jd_knowledge.md](docs/jd_knowledge.md)（按岗位要求拆解的知识地图和面试题）
 
 ## 复现
 
