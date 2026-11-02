@@ -7,6 +7,8 @@ utterances in manifests/<lang>.jsonl and records:
   rtf        (total - load) time / audio duration, from whisper's own timings
   rtf_wall   process wall time / audio duration (includes model load)
   peak_mb    peak working set of the whisper-cli process
+  vram_mb    (--vram only) peak GPU memory in use above the level just before
+             the process started, so it includes the CUDA context
   load_ms, encode_ms, decode_ms, ...   per-utterance averages
 
 Utterances are processed in batches inside one whisper-cli process, so the
@@ -17,6 +19,7 @@ interrupted run can be resumed by re-running the same command.
 Usage:
   py scripts/evaluate.py --tag week2_cpu --langs en zh ja --threads 6
   py scripts/evaluate.py --tag smoke --langs en --models base-q4_k --limit 5
+  py scripts/evaluate.py --tag week2_cuda --threads 8 --vram --bin third_party/whisper.cpp/build-cuda/bin/RelWithDebInfo
 """
 import argparse
 import csv
@@ -60,9 +63,26 @@ def error_rate(refs, hyps, lang):
     return jiwer.wer(refs, hyps) if lang == "en" else jiwer.cer(refs, hyps)
 
 
-def run_measured(cmd):
-    """Run cmd, return (wall seconds, peak working set MB, stderr text)."""
+class Vram:
+    """Device-wide GPU memory in use (GPU 0), via NVML. Per-process numbers are not
+    available under the Windows WDDM driver model, so callers take the rise above a
+    baseline read just before launching the process."""
+
+    def __init__(self):
+        import pynvml
+        pynvml.nvmlInit()
+        self._info = pynvml.nvmlDeviceGetMemoryInfo
+        self._dev = pynvml.nvmlDeviceGetHandleByIndex(0)
+
+    def used_mb(self):
+        return self._info(self._dev).used / 2**20
+
+
+def run_measured(cmd, vram=None):
+    """Run cmd, return (wall seconds, peak working set MB, peak VRAM rise MB, stderr text)."""
     with tempfile.TemporaryFile() as out, tempfile.TemporaryFile() as err:
+        base = vram.used_mb() if vram else 0.0
+        peak_v = base
         t0 = time.perf_counter()
         p = subprocess.Popen([str(c) for c in cmd], stdout=out, stderr=err)
         ps, peak = psutil.Process(p.pid), 0
@@ -71,6 +91,8 @@ def run_measured(cmd):
                 peak = max(peak, ps.memory_info().peak_wset)  # Windows: monotonic peak, so polling misses nothing
             except psutil.NoSuchProcess:
                 break
+            if vram:
+                peak_v = max(peak_v, vram.used_mb())  # not monotonic, but whisper allocates at load and keeps it
             time.sleep(0.05)
         p.wait()
         wall = time.perf_counter() - t0
@@ -78,21 +100,21 @@ def run_measured(cmd):
         stderr = err.read().decode("utf-8", errors="replace")
     if p.returncode != 0:
         raise SystemExit(f"whisper-cli failed ({p.returncode}):\n{stderr[-2000:]}")
-    return wall, peak / 2**20, stderr
+    return wall, peak / 2**20, peak_v - base, stderr
 
 
-def evaluate(cli, lang, model, threads, utts, hyp_dir, extra_args):
+def evaluate(cli, lang, model, threads, utts, hyp_dir, extra_args, vram=None):
     size, quant = model.split("-", 1)
     mpath = model_path(size, quant)
     hyp_dir.mkdir(parents=True, exist_ok=True)
 
-    wall, peak, timings = 0.0, 0.0, {}
+    wall, peak, peak_v, timings = 0.0, 0.0, 0.0, {}
     for i in range(0, len(utts), BATCH):
         cmd = [cli, "-m", mpath, "-t", threads, "-l", lang, "-nt", "-otxt", *extra_args]
         for u in utts[i:i + BATCH]:
             cmd += ["-f", ROOT / u["audio"], "-of", hyp_dir / u["id"]]
-        w, pk, stderr = run_measured(cmd)
-        wall, peak = wall + w, max(peak, pk)
+        w, pk, pv, stderr = run_measured(cmd, vram)
+        wall, peak, peak_v = wall + w, max(peak, pk), max(peak_v, pv)
         for k, v in parse_timings(stderr).items():
             if not k.endswith("per_run_ms"):
                 timings[k] = timings.get(k, 0.0) + v
@@ -118,6 +140,7 @@ def evaluate(cli, lang, model, threads, utts, hyp_dir, extra_args):
         "rtf": round((timings["total_ms"] - timings["load_ms"]) / 1000 / audio_s, 4),
         "rtf_wall": round(wall / audio_s, 4),
         "peak_mb": round(peak, 1),
+        **({"vram_mb": round(peak_v, 1)} if vram else {}),
         **{k: round(timings.get(f"{k}_ms", 0.0) / n, 1) for k in ["load", "mel", "sample", "encode", "decode", "batchd", "prompt"]},
     }
 
@@ -146,10 +169,12 @@ if __name__ == "__main__":
     ap.add_argument("--repeats", type=int, default=1)
     ap.add_argument("--limit", type=int, help="only the first N utterances of each manifest")
     ap.add_argument("--bin", type=Path, default=BIN, help="directory containing whisper-cli.exe")
+    ap.add_argument("--vram", action="store_true", help="also record peak GPU memory (needs nvidia-ml-py)")
     ap.add_argument("--extra", nargs=argparse.REMAINDER, default=[], help="extra whisper-cli arguments (put last)")
     args = ap.parse_args()
 
     cli = args.bin / "whisper-cli.exe"
+    vram = Vram() if args.vram else None
     out_csv = RESULTS / f"{args.tag}.csv"
     rows = load_rows(out_csv)
     done = {tuple(str(r[k]) for k in KEY) for r in rows}
@@ -164,8 +189,9 @@ if __name__ == "__main__":
                     if key in done:
                         continue
                     hyp_dir = RESULTS / "hyp" / args.tag / lang / model
-                    r = evaluate(cli, lang, model, threads, utts, hyp_dir, args.extra)
+                    r = evaluate(cli, lang, model, threads, utts, hyp_dir, args.extra, vram)
                     rows.append(dict(zip(KEY, key)) | r)
                     save_rows(out_csv, rows)
+                    gpu = f"  vram={r['vram_mb']:.0f} MB" if vram else ""
                     print(f"{lang} {model:11} t={threads:2} rep={rep}  {r['metric']}={r['err']:.4f}  "
-                          f"rtf={r['rtf']:.3f}  peak={r['peak_mb']:.0f} MB", flush=True)
+                          f"rtf={r['rtf']:.3f}  peak={r['peak_mb']:.0f} MB{gpu}", flush=True)
