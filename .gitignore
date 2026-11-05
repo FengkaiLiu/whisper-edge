@@ -6,3 +6,4 @@ __pycache__/
 build_cuda_*.txt
 data/
 results/hyp/**/*.txt
+docs/jd_knowledge.md

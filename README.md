@@ -19,7 +19,7 @@
   - `cuda/devq.cu`：GPU 参数查询 + 显存 / PCIe 带宽测试
 - `manifests/`：评测用的句子清单（音频本身在 `data/`，不入库）
 - `results/`：原始数据（CSV）和每周的分析，见 [第 1 周](results/week1.md)、[第 2 周](results/week2.md)（CPU）、[第 2 周 GPU](results/week2_cuda.md)（RTX 5080 + CUDA）、[第 2 周台式机 CPU](results/week2_9700x.md)（Ryzen 7 9700X，把加速拆成换 CPU 和加 GPU 两段）
-- `docs/`：学习笔记，见 [chunk1.md](docs/chunk1.md)（第 1 周的完整推导）、[cuda_guide.md](docs/cuda_guide.md)（CUDA 入门和第一轮 GPU 数据，配合第 2–3 周）、[jd_knowledge.md](docs/jd_knowledge.md)（按岗位要求拆解的知识地图和面试题）
+- `docs/`：学习笔记，见 [chunk1.md](docs/chunk1.md)（第 1 周的完整推导）、[cuda_guide.md](docs/cuda_guide.md)（CUDA 入门和第一轮 GPU 数据，配合第 2–3 周）
 
 ## 复现
 
